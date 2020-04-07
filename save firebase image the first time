@@ -111,3 +111,23 @@ Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
 //                startActivityForResult(galleryIntent, GALLERY_CODE);
 //                patientProfileImage.setMaxHeight(100);
 //                patientProfileImage.setMaxWidth(100);
+
+
+
+
+outside of the previous method code, the following:
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY_CODE && resultCode == RESULT_OK ){
+            if (data != null){ //maybe change this or omit it
+                patientImageUri = data.getData();
+                patientProfileImage.setImageURI(patientImageUri); //upload and show uploaded intent image
+                patientProfileImage.setMaxHeight(100);
+                patientProfileImage.setMaxWidth(100);
+            }
+        }else {
+
+        }
+    }
