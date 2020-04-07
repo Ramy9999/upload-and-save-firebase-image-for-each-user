@@ -1,0 +1,113 @@
+Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, GALLERY_CODE);
+                patientProfileImage.setMaxHeight(100);
+                patientProfileImage.setMaxWidth(100);
+
+                if(patientImageUri != null){
+
+                   assert patientImageUri != null;
+
+
+                    patientProfileImage.setMaxHeight(100);
+                    patientProfileImage.setMaxWidth(100);
+
+                    final StorageReference filepath = storageReference
+                            .child("patient_profile_images")
+                            .child("patient_image_" + Timestamp.now().getSeconds());
+
+                    filepath.putFile(patientImageUri)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    progressBar.setVisibility(View.INVISIBLE);
+
+                                    filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+
+                                            String imageUrl = uri.toString();
+                                            //Todo: create a Journal Object model, invoke the collection reference and save the journal instance
+//                                            Journal journal = new Journal();
+//                                            journal.setTitle(title);
+//                                            journal.setThought(thoughts);
+//                                            journal.setImageUrl(imageUrl);
+//                                            journal.setTimeAdded(new Timestamp(new Date()));
+//                                            journal.setUserName(currentUserName);
+//                                            journal.setUserId(currentUserId);
+
+
+                                            PatientModel patientModel = new PatientModel();
+                                            patientModel.setPatientProfilePicture(imageUrl);
+
+                                            collectionReferencePatient.add(patientModel)
+                                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentReference documentReference) {
+
+//                                                           Picasso.get()
+//                                                                   .load(patientImageUri).into(patientProfileImage);
+
+                                                            Glide.with(Objects.requireNonNull(getActivity()))
+                                                          .load(patientImageUri)
+                                                          .into(patientProfileImage);
+
+//                                                           patientProfileImage.setImageURI(patientImageUri);
+
+                                                            Toast.makeText(getActivity(), "Profile Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                                                            patientProfileImage.setMaxHeight(100);
+                                                            patientProfileImage.setMaxWidth(100);
+
+
+                                                            //update user profile with profile uploaded image
+                                                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                                    .setPhotoUri(patientImageUri)
+                                                                    .build();
+
+                                                            user.updateProfile(profileUpdates)
+                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            if (task.isSuccessful()) {
+                                                                                Toast.makeText(getActivity(),"profile updated with the new profile image", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        }
+                                                                    });
+
+//                                                            startActivity(new Intent(PostJournalActivity.this, JournalListActivity.class));
+//                                                            finish();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+
+                                                        }
+                                                    });
+
+                                        }
+                                    });
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+
+
+
+                }
+
+                else {
+
+                }
+
+
+//                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//                galleryIntent.setType("image/*");
+//                startActivityForResult(galleryIntent, GALLERY_CODE);
+//                patientProfileImage.setMaxHeight(100);
+//                patientProfileImage.setMaxWidth(100);
